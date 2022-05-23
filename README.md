@@ -1,5 +1,4 @@
 # BERT Pretraining
-----
 记录BERT模型复现工作，后续会添加BERT在其他下游任务的实现
 
 项目参考https://github.com/moon-hotel/BertWithPretrained
