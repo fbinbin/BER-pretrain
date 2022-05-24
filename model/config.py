@@ -8,6 +8,7 @@ class Config():
     def __init__(self, vocab_size=21128,
                     hidden_size=768,
                     num_hidden_layers=12,
+                    num_heads=12,
                     pad_token_id=0,
                     initializer_range=0.02,
                     max_position_embedding=512,
@@ -31,3 +32,4 @@ class Config():
         self.num_hidden_layers = num_hidden_layers
 
         self.pooler_type = pooler_type
+        self.num_heads = num_heads

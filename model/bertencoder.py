@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mymultiheadattention import MyMultiheadAttention
-from config import Config
-from embedding import BertEmbedding
+from model.mymultiheadattention import MyMultiheadAttention
+from model.config import Config
+from model.embedding import BertEmbedding
 
 """
     整个BertEncoder由多个BertLayer堆叠形成；
@@ -73,7 +73,7 @@ class BertIntermediate(nn.Module):
         self.dense = nn.Linear(config.hidden_size, config.intermediate_size)
 
         # 获得激活函数
-        if isinstance(config.hidden_act, srt):
+        if isinstance(config.hidden_act, str):
             self.intermediate_act_fn = get_activation(config.hidden_act)
         else:
             self.intermediate_act_fn = config.hidden_act
@@ -110,7 +110,7 @@ class BertOutput(nn.Module):
         """
         hidden_states = self.dense(hidden_states)
         hidden_states = self.dropout(hidden_states)
-        hidden_states = self.LayerNorm(input_tensor, hidden_states)
+        hidden_states = self.LayerNorm(input_tensor + hidden_states)
         return hidden_states
 
 class BertLayer(nn.Module):
@@ -130,10 +130,11 @@ class BertLayer(nn.Module):
             return 
                 [src_len, batch_size, hidden_size]
         """
-        attention_ouptut = self.bert_attention(hidden_states,
+        attention_output = self.bert_attention(hidden_states,
                                                 key_padding_mask=attention_mask)
         intermediate_output = self.bert_intermediate(attention_output)
-        layer_output = self.bert_output(hidden_states, attention_output)
+        
+        layer_output = self.bert_output(intermediate_output, attention_output)
         return layer_output
 
 '''堆叠多个layer组成Bert Encoder'''
@@ -149,7 +150,7 @@ class BertEncoder(nn.Module):
         all_encoder_layers = []
         layer_output = hidden_states
         for i, layer_module in enumerate(self.bert_layers):
-            layer_ouput = layer_module(layer_ouput, attention_mask)
+            layer_output = layer_module(layer_output, attention_mask)
             all_encoder_layers.append(layer_output)
         
         return all_encoder_layers
@@ -222,4 +223,3 @@ def get_activation(activation_string):
         return nn.Tanh()
     else:
         raise ValueError("Unspported activation: %s" % act)
-

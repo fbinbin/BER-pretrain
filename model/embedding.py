@@ -40,7 +40,7 @@ class PositionalEmbedding(nn.Module):
             return [position_ids_len, 1, hidden_size]
 
         """
-        return self.positional_embedding(position_ids).tanspose(0, 1)
+        return self.positional_embedding(position_ids).transpose(0, 1)
         
 
 class SegmentEmbedding(nn.Module):
